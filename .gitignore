@@ -6,4 +6,9 @@ node_modules/
 /blob-report/
 /playwright/.cache/
 /playwright/.auth/
+
+# OSX
 *.DS_Store
+
+# Data
+images/*

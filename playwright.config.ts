@@ -24,9 +24,8 @@ export default defineConfig({
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: 'html',
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
-  
-  slowMo: 500,       // milliseconds between actions
-  // viewport: { width: 1280, height: 900 },
+  timeout: 100000,
+  slowMo: 1000,       // milliseconds between actions
 
   use: {
     /* Base URL to use in actions like `await page.goto('')`. */
@@ -48,7 +47,7 @@ export default defineConfig({
         ...devices['Desktop Chrome'], // Line 43
         headless: false,
         userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
-        slowMo: 500,
+        slowMo: 2000,
       },
     },
 

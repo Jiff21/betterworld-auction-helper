@@ -6,6 +6,9 @@ import { readAuctionItems } from '../utils/readCsv';
 import { parseImageUrls } from '../utils/parseImageUrls';
 import { downloadImage } from '../utils/downloadImages';
 
+
+const auctionUrl= 'https://dashboard.betterworld.org/auctions/56215/items'
+
 test('Add auction items from CSV', async ({ page }) => {
   const items = readAuctionItems();
 
@@ -19,22 +22,32 @@ test('Add auction items from CSV', async ({ page }) => {
     .fill(process.env.BW_PASSWORD!);
 
   await page.getByRole('button', { name: 'Sign in', exact: true }).click();
-  await page.waitForLoadState('networkidle');
+  // await page.waitForLoadState('networkidle');
+  await page.getByRole('link', { name: ' Auctions' })
 
   // ── NAVIGATION ─────────────────
   await page.getByRole('link', { name: ' Auctions' }).click();
-  await page.getByRole('link', { name: 'Manage ' }).first().click();
-  await page.getByRole('link', { name: 'Items' }).click();
+  // await page.getByRole('link', { name: 'Manage ' }).first().click();
+  // await page.getByRole('link', { name: 'Items' }).click();
 
+  let i = 0;
   // ── CSV LOOP ───────────────────
   for (const [index, item] of items.entries()) {
-    if (index > 0) break; // SAFETY: remove after testing
-
+    // if (index > 0) break; // SAFETY: remove after testing
+    
+    await page.goto(
+      auctionUrl
+    );
+    
     console.log(`Adding item: ${item.title}`);
+    i += 1
+    console.log(`Adding item: ${i} / ${items.length}`);
+    await page.waitForTimeout(3000);
 
     await page.getByRole('link', { name: 'New item', exact: true }).click();
 
-    await page.getByRole('textbox', { name: 'Title' }).fill(item.title);
+    await page.getByRole('textbox', { name: 'Title' }).fill(item.title + ' - ' + item.descriptor);
+    
     await page.getByRole('textbox', { name: 'Location ?' }).fill(item.location);
 
     await page.getByRole('spinbutton', { name: 'Estimated value ?' })
@@ -54,6 +67,9 @@ test('Add auction items from CSV', async ({ page }) => {
       name: 'Save & continue to images'
     }).click();
 
+    // click through to item details
+    await page.locator('#add_image, #go-to-edit-page').click();
+
     // ── IMAGES (optional) ─────────
     const urls = parseImageUrls(item.imageUrls);
 
@@ -64,36 +80,49 @@ test('Add auction items from CSV', async ({ page }) => {
 
       const localPath = await downloadImage(url, filename);
 
-      await page.getByRole('link', { name: 'Add image' }).click();
-      await page.getByRole('link', { name: 'Browse' })
-        .setInputFiles(localPath);
+      //Add Image Buttons
+      await page.locator('#add_image').click();
+
+      const fileChooserPromise = page.waitForEvent('filechooser');
+      await page.getByRole('link', { name: 'Browse' }).click();
+      const fileChooser = await fileChooserPromise;
+      await fileChooser.setFiles(localPath);
 
       await page.locator('#new_image_form')
         .getByRole('button', { name: 'Save' }).click();
+      await page.waitForTimeout(3000);
+      // await page.locator('#new_image_form').getByLabel('Close').click();
     }
-
-    if (urls.length > 0) {
-      await page.getByRole('button', { name: 'Save' }).click();
-    }
+    
+    await page.getByRole('button', { name: 'Save' }).click();
 
     // ── DONOR ─────────────────────
     await page.getByRole('link', { name: 'Donor' }).click();
 
-    await page.locator('#display_name').fill(item.donorName);
-    await page.getByRole('textbox', { name: 'Website' })
-      .fill(item.donorWebsite);
+    if (item.donorName && item.donorName.trim() !== "") {
+      await page.locator('#display_name').fill(item.donorName);
+    }
 
-    await page.locator('#fulfillment_name')
-      .fill(item.fulfillmentName);
+    if (item.donorWebsite && item.donorWebsite.trim() !== "") {
+      await page.getByRole('textbox', { name: 'Website' })
+        .fill(item.donorWebsite);
+    }
 
-    await page.getByRole('textbox', { name: 'Email' })
-      .fill(item.fulfillmentEmail);
+    if (item.fulfillmentName && item.fulfillmentName.trim() !== "") {
+      await page.locator('#fulfillment_name')
+        .fill(item.fulfillmentName);
+    }
 
-    await page.getByRole('button', { name: 'Save' }).click();
+    if (item.fulfillmentEmail && item.fulfillmentEmail.trim() !== "") {
+      await page.getByRole('textbox', { name: 'Email' })
+        .fill(item.fulfillmentEmail);
+    }
 
-    await page.goto(
-      'https://dashboard.betterworld.org/auctions/56215/items'
-    );
+    if (item.donorName || item.donorWebsite | item.fulfillmentName || item.fulfillmentEmail) {
+      await page.getByRole('button', { name: 'Save' }).click();
+    }
+
+    await page.goto(auctionUrl);
     await page.waitForLoadState('networkidle');
   }
 });
