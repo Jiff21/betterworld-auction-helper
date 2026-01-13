@@ -24,7 +24,7 @@ export default defineConfig({
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: 'html',
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
-  timeout: 100000,
+  timeout: 59 * 60 * 1000, // 59 minutes
   slowMo: 1000,       // milliseconds between actions
 
   use: {

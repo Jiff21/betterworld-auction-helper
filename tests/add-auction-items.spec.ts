@@ -27,8 +27,6 @@ test('Add auction items from CSV', async ({ page }) => {
 
   // ── NAVIGATION ─────────────────
   await page.getByRole('link', { name: ' Auctions' }).click();
-  // await page.getByRole('link', { name: 'Manage ' }).first().click();
-  // await page.getByRole('link', { name: 'Items' }).click();
 
   let i = 0;
   // ── CSV LOOP ───────────────────
@@ -42,7 +40,7 @@ test('Add auction items from CSV', async ({ page }) => {
     console.log(`Adding item: ${item.title}`);
     i += 1
     console.log(`Adding item: ${i} / ${items.length}`);
-    await page.waitForTimeout(3000);
+    // await page.waitForTimeout(3000);
 
     await page.getByRole('link', { name: 'New item', exact: true }).click();
 
@@ -60,8 +58,16 @@ test('Add auction items from CSV', async ({ page }) => {
       name: /Short description/
     }).fill(item.shortDescription);
 
-    await page.locator('#overview-editor')
-      .fill(item.longDescription);
+    await page.locator('button .filter-option-inner-inner').click();
+    await page.getByRole('listbox').getByText(item.category, { exact: true }).click();
+
+    const longDescriptionEditor = page
+      .locator('#overview-editor[contenteditable="true"]');
+    await longDescriptionEditor.waitFor({ state: 'visible' });
+    '#overview-editor'
+    await longDescriptionEditor.click();
+    await longDescriptionEditor.fill(item.longDescription);
+
 
     await page.getByRole('button', {
       name: 'Save & continue to images'
@@ -82,6 +88,7 @@ test('Add auction items from CSV', async ({ page }) => {
 
       //Add Image Buttons
       await page.locator('#add_image').click();
+      const imageModal = page.locator('#new_image');
 
       const fileChooserPromise = page.waitForEvent('filechooser');
       await page.getByRole('link', { name: 'Browse' }).click();
@@ -90,11 +97,11 @@ test('Add auction items from CSV', async ({ page }) => {
 
       await page.locator('#new_image_form')
         .getByRole('button', { name: 'Save' }).click();
-      await page.waitForTimeout(3000);
-      // await page.locator('#new_image_form').getByLabel('Close').click();
+      await imageModal.waitFor({ state: 'hidden' });
+      await page.waitForTimeout(1000);
     }
     
-    await page.getByRole('button', { name: 'Save' }).click();
+    await page.getByRole('button', { name: 'Save', exact: true }).click();
 
     // ── DONOR ─────────────────────
     await page.getByRole('link', { name: 'Donor' }).click();
@@ -120,6 +127,18 @@ test('Add auction items from CSV', async ({ page }) => {
 
     if (item.donorName || item.donorWebsite | item.fulfillmentName || item.fulfillmentEmail) {
       await page.getByRole('button', { name: 'Save' }).click();
+      await page.waitForTimeout(500);
+    }
+
+    // fill notes with special instructions if populated
+    if (item.notes) {
+      const notesField = page
+        .locator('#notes-editor[contenteditable="true"]');
+      await notesField.waitFor({ state: 'visible' });
+      await notesField.click();
+      await notesField.fill(item.notes);
+      await page.getByRole('button', { name: 'Save' }).click();
+      await page.waitForTimeout(500);
     }
 
     await page.goto(auctionUrl);

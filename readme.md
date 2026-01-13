@@ -11,6 +11,9 @@ export BW_EMAIL=''
 export BW_PASSWORD=''
 ```
 
+## MV Data
+
+In google sheets go to the "2026 Accepted donations" filter out uploaded content and move it to the `data/` folder in this project.
 
 # Run 
 
@@ -21,6 +24,13 @@ Run slowly for debugging purposes
 ```
 npx playwright test tests/add-auction-items.spec.ts
 ```
+
+
+```
+CSV_NAME='2026 Auction Donations Outreach Spreadsheet - 2026 Accepted donations.csv' npx playwright test tests/add-auction-items.spec.ts. --ui
+```
+
+CSV_NAME='2026 Auction Donations Outreach Spreadsheet - 2026 Accepted donations.csv' DEBUG=pw:api npx playwright test tests/add-auction-items.spec.ts --ui
 
 
 
