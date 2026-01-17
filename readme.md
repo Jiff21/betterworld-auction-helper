@@ -1,6 +1,10 @@
-# Better World Auction Item creation helper
+# Better World Auction Item Creator
 
-## SETUP
+## Description
+
+To save the time of manually creating items from PTA Donations spreadsheet I automated the task using playwright.
+
+## Setup
 
 ### Install dependencies
 
