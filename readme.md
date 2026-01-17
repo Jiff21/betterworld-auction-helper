@@ -17,11 +17,13 @@ npm i
 
 Duplicate the file `example.env` file and name it `local.env`, fill out with your auction url, spreadsheet name, email and password. 
 
-Before using the script you need to manually add 1 new item, then use the "New Section" button in Bettwe World to create all the categories from the spreadsheet, if you are not using default categories.
+Before using the script you need to manually add 1 new item, then use the "New Section" button in Better World to create all the categories from the spreadsheet, if you are not using default categories.
 
 ### Spreadsheet Data
 
 Export the Google Sheet as a csv and put it in the data folder inside this project. Use `examplesheet.xlsx` as a guide and the import is reliant on columns H-V and column E for special notes.
+
+If you need to import more items from the spreadsheet after 2nd run, make sure all previously entered items get marked Y in column G of the spreadhseet. Then export the csv and replace the one in the data sheet.
 
 ## Run 
 
