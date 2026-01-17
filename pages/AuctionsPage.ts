@@ -1,31 +1,33 @@
 import { Page, Locator } from '@playwright/test';
 
 export class AuctionsPage {
-  readonly page: Page;
+  constructor(private readonly page: Page) {}
 
-  readonly auctionsNavLink: Locator;
-  readonly newItemLink: Locator;
+  // Lazy locators
+  private get auctionsNavLink(): Locator {
+    return this.page.getByRole('link', { name: ' Auctions' });
+  }
 
-  constructor(page: Page) {
-    this.page = page;
-
-    this.auctionsNavLink = page.getByRole('link', { name: ' Auctions' });
-    this.newItemLink = page.getByRole('link', {
+  private get newItemLink(): Locator {
+    return this.page.getByRole('link', {
       name: 'New item',
-      exact: true
+      exact: true,
     });
   }
 
   async goToAuctions() {
-    await this.auctionsNavLink.click();
+    await Promise.all([
+      this.auctionsNavLink.click(),
+    ]);
   }
 
   async goToItems(auctionUrl: string) {
     await this.page.goto(auctionUrl);
-    await this.page.waitForLoadState('networkidle');
   }
 
   async startNewItem() {
-    await this.newItemLink.click();
+    await Promise.all([
+      this.newItemLink.click(),
+    ]);
   }
 }

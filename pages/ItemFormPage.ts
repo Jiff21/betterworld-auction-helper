@@ -2,87 +2,98 @@ import { Page } from '@playwright/test';
 import path from 'path';
 import { parseImageUrls } from '../utils/parseImageUrls';
 import { downloadImage } from '../utils/downloadImages';
+import { fillRichTextEditor } from '../utils/richTextEditor';
+
 
 export class ItemFormPage {
   constructor(private readonly page: Page) {}
 
   // ─────────────────────────────────────────────
-  // Locators (named once, reused everywhere)
+  // Lazy locators (evaluated at time of use)
   // ─────────────────────────────────────────────
-  private titleInput = this.page.getByRole('textbox', { name: 'Title' });
-  private locationInput = this.page.getByRole('textbox', { name: 'Location ?' });
-  private estimatedValueInput = this.page.getByRole('spinbutton', {
-    name: 'Estimated value ?',
-  });
-  private startingBidInput = this.page.getByRole('spinbutton', {
-    name: 'Starting bid',
-  });
-  private shortDescriptionInput = this.page.getByRole('textbox', {
-    name: /Short description/,
-  });
+  private get titleInput() {
+    return this.page.getByRole('textbox', { name: 'Title' });
+  }
 
-  private overviewEditorContainer = this.page.locator('#overview-editor');
-  private saveAndContinueButton = this.page.getByRole('button', {
-    name: 'Save & continue to images',
-  });
+  private get locationInput() {
+    return this.page.getByRole('textbox', { name: 'Location ?' });
+  }
 
-  // ─────────────────────────────────────────────
-  // Private helpers
-  // ─────────────────────────────────────────────
-  private async fillRichText(
-    containerSelector: string,
-    text: string
-  ) {
-    if (!text || !text.trim()) return;
+  private get estimatedValueInput() {
+    return this.page.getByRole('spinbutton', { name: 'Estimated value ?' });
+  }
 
-    // Ensure form is mounted
-    await this.titleInput.waitFor();
+  private get startingBidInput() {
+    return this.page.getByRole('spinbutton', { name: 'Starting bid' });
+  }
 
-    const container = this.page.locator(containerSelector);
-    const editor = container.locator('[contenteditable="true"]');
+  private get shortDescriptionInput() {
+    return this.page.getByRole('textbox', {
+      name: /Short description/,
+    });
+  }
 
-    // Activate editor (this causes editable node to mount)
-    await container.click();
-
-    // Wait for the actual editable surface
-    await editor.waitFor({ state: 'attached' });
-
-    // Fill content
-    await editor.fill(text);
+  private get saveAndContinueButton() {
+    return this.page.getByRole('button', {
+      name: 'Save & continue to images',
+    });
   }
 
   // ─────────────────────────────────────────────
-  // Public page actions
+  // Page readiness
+  // ─────────────────────────────────────────────
+  async waitForReady() {
+    await this.titleInput.waitFor({ state: 'visible' });
+  }
+
+
+
+  // ─────────────────────────────────────────────
+  // Public actions
   // ─────────────────────────────────────────────
   async fillBasicInfo(item: any) {
+    await this.waitForReady();
+
     await this.titleInput.fill(`${item.title} - ${item.descriptor}`);
     await this.locationInput.fill(item.location);
     await this.estimatedValueInput.fill(String(item.estimatedValue));
     await this.startingBidInput.fill(String(item.startingBid));
     await this.shortDescriptionInput.fill(item.shortDescription);
 
-    // Category
-    await this.page.locator('button .filter-option-inner-inner').click();
+    // Category selection
+    await this.page
+      .locator('button .filter-option-inner-inner')
+      .click();
+
     await this.page
       .getByRole('listbox')
       .getByText(item.category, { exact: true })
       .click();
 
-    // Long description (rich text)
-    await this.fillRichText('#overview-editor', item.longDescription);
+    // Long description
+    await fillRichTextEditor(
+      this.page,
+      '#overview-editor',
+      item.longDescription
+    );
 
-    await this.saveAndContinueButton.click();
+
+    // Navigation-safe save
+    await Promise.all([
+      this.saveAndContinueButton.click(),
+    ]);
   }
 
   async uploadImages(imageUrls?: string) {
     const urls = parseImageUrls(imageUrls);
     if (!urls.length) return;
 
+    await this.page.locator('#go-to-edit-page').click();
+    
     for (let i = 0; i < urls.length; i++) {
       const url = urls[i];
       const ext = path.extname(url).split('?')[0] || '.png';
       const filename = `item-${Date.now()}-${i}${ext}`;
-
       const localPath = await downloadImage(url, filename);
 
       const imageModal = this.page.locator('#new_image');
@@ -96,37 +107,44 @@ export class ItemFormPage {
 
       await chooser.setFiles(localPath);
 
-      await this.page
-        .locator('#new_image_form')
-        .getByRole('button', { name: 'Save' })
-        .click();
-
-      await imageModal.waitFor({ state: 'hidden' });
+      await Promise.all([
+        imageModal.waitFor({ state: 'hidden' }),
+        this.page
+          .locator('#new_image_form')
+          .getByRole('button', { name: 'Save' })
+          .click(),
+      ]);
     }
 
-    await this.page.getByRole('button', { name: 'Save', exact: true }).click();
+    await Promise.all([
+      this.page.getByRole('button', { name: 'Save', exact: true }).click(),
+    ]);
   }
 
   async fillDonor(item: any) {
     await this.page.getByRole('link', { name: 'Donor' }).click();
 
-    if (item.donorName)
+    if (item.donorName) {
       await this.page.locator('#display_name').fill(item.donorName);
+    }
 
-    if (item.donorWebsite)
+    if (item.donorWebsite) {
       await this.page
         .getByRole('textbox', { name: 'Website' })
         .fill(item.donorWebsite);
+    }
 
-    if (item.fulfillmentName)
+    if (item.fulfillmentName) {
       await this.page
         .locator('#fulfillment_name')
         .fill(item.fulfillmentName);
+    }
 
-    if (item.fulfillmentEmail)
+    if (item.fulfillmentEmail) {
       await this.page
         .getByRole('textbox', { name: 'Email' })
         .fill(item.fulfillmentEmail);
+    }
 
     if (
       item.donorName ||
@@ -134,16 +152,27 @@ export class ItemFormPage {
       item.fulfillmentName ||
       item.fulfillmentEmail
     ) {
-      await this.page.getByRole('button', { name: 'Save', exact: true }).click();
+      await Promise.all([
+        this.page.getByRole('button', { name: 'Save', exact: true }).click(),
+      ]);
     }
   }
 
+
   async fillNotes(notes?: string) {
-    if (!notes || !notes.trim()) return;
+    if (!notes?.trim()) return;
 
     await this.page.getByRole('link', { name: 'Notes' }).click();
-    await this.fillRichText('#notes-editor', notes);
+    
+    await fillRichTextEditor(
+      this.page,
+      '#notes-editor',
+      notes
+    );
 
-    await this.page.getByRole('button', { name: 'Save', exact: true }).click();
+
+    await Promise.all([
+      this.page.getByRole('button', { name: 'Save', exact: true }).click(),
+    ]);
   }
 }

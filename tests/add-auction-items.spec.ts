@@ -9,36 +9,45 @@ import { ItemFormPage } from '../pages/ItemFormPage';
 const auctionItemsUrl =
   'https://dashboard.betterworld.org/auctions/56215/items';
 
-test('Add auction items from CSV', async ({ page }) => {
-  const items = readAuctionItems();
+test.describe('Auction item ingestion', () => {
+  test('Add auction items from CSV', async ({ page }) => {
+    // Long-running workflow (uploads + rich text + navigation)
+    test.setTimeout(10 * 60 * 1000);
 
-  const loginPage = new LoginPage(page);
-  const auctionsPage = new AuctionsPage(page);
-  const itemForm = new ItemFormPage(page);
+    const items = readAuctionItems();
 
-  // ── LOGIN ───────────────────────────────
-  await loginPage.goto();
-  await loginPage.login(
-    process.env.BW_EMAIL!,
-    process.env.BW_PASSWORD!
-  );
+    const loginPage = new LoginPage(page);
+    const auctionsPage = new AuctionsPage(page);
+    const itemForm = new ItemFormPage(page);
 
-  // ── NAVIGATION ──────────────────────────
-  await auctionsPage.goToAuctions();
+    // ── LOGIN ───────────────────────────────
+    await loginPage.goto();
+    await loginPage.login(
+      process.env.BW_EMAIL!,
+      process.env.BW_PASSWORD!
+    );
 
-  let i = 0;
+    // ── PROCESS ITEMS ──────────────────────
+    let index = 0;
 
-  for (const item of items) {
-    i++;
-    console.log(`Adding item ${i} / ${items.length}: ${item.title}`);
+    for (const item of items) {
+      index++;
+      console.log(
+        `\n▶ Adding item ${index} / ${items.length}: ${item.title}`
+      );
 
-    await auctionsPage.goToItems(auctionItemsUrl);
-    await auctionsPage.startNewItem();
+      // Always navigate fresh for each item
+      await auctionsPage.goToItems(auctionItemsUrl);
 
-    // ── ITEM WORKFLOW ────────────────────
-    await itemForm.fillBasicInfo(item);
-    await itemForm.uploadImages(item.imageUrls);
-    await itemForm.fillDonor(item);
-    await itemForm.fillNotes(item.notes);
-  }
+      // Start item creation
+      await auctionsPage.startNewItem();
+
+      // ── ITEM WORKFLOW ────────────────────
+      await itemForm.fillBasicInfo(item);
+      await itemForm.uploadImages(item.imageUrls);
+      await itemForm.fillDonor(item);
+      await itemForm.fillNotes(item.notes);
+
+    }
+  });
 });

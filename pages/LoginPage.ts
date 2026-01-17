@@ -1,20 +1,21 @@
 import { Page, Locator } from '@playwright/test';
 
 export class LoginPage {
-  readonly page: Page;
+  constructor(private readonly page: Page) {}
 
-  readonly emailInput: Locator;
-  readonly passwordInput: Locator;
-  readonly signInButton: Locator;
+  // Lazy locators
+  private get emailInput(): Locator {
+    return this.page.getByRole('textbox', { name: 'Email' });
+  }
 
-  constructor(page: Page) {
-    this.page = page;
+  private get passwordInput(): Locator {
+    return this.page.getByRole('textbox', { name: 'Password' });
+  }
 
-    this.emailInput = page.getByRole('textbox', { name: 'Email' });
-    this.passwordInput = page.getByRole('textbox', { name: 'Password' });
-    this.signInButton = page.getByRole('button', {
+  private get signInButton(): Locator {
+    return this.page.getByRole('button', {
       name: 'Sign in',
-      exact: true
+      exact: true,
     });
   }
 
@@ -23,8 +24,14 @@ export class LoginPage {
   }
 
   async login(email: string, password: string) {
+    await this.emailInput.waitFor({ state: 'visible' });
+
     await this.emailInput.fill(email);
     await this.passwordInput.fill(password);
-    await this.signInButton.click();
+
+    await Promise.all([
+      this.page.waitForNavigation(),
+      this.signInButton.click(),
+    ]);
   }
 }
