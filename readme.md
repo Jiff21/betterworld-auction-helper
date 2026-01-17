@@ -2,42 +2,44 @@
 
 ## Description
 
-To save the time of manually creating items from PTA Donations spreadsheet I automated the task using playwright.
+To save time manually creating items from the PTA Donations spreadsheet, I automated the task using Playwright.
 
 ## Setup
 
 ### Install dependencies
 
-Node install is a prequesite
+Node.js is a prerequisite.
 
-```bash
+```sh
 cd <this folder>
 npm i
 ```
+### Set account, spreadsheet name and auction details in an ENV file
 
-Duplicate the file `example.env` file and name it `local.env`, fill out with your auction url, spreadsheet name, email and password. 
+Duplicate the example.env file, name it local.env, and fill it out with your auction URL, spreadsheet name, email, and password.
 
-Before using the script you need to manually add 1 new item, then use the "New Section" button in Better World to create all the categories from the spreadsheet, if you are not using default categories.
+### Create categories in Betterworld (if necessary)
+
+Before using the script, you need to manually add one new item, then use the "New Section" button in Better World to create all the categories from the spreadsheet if you are not using default categories.
 
 ### Spreadsheet Data
 
-Export the Google Sheet as a csv and put it in the data folder inside this project. Use `examplesheet.xlsx` as a guide and the import is reliant on columns H-V and column E for special notes.
+Export the Google Sheet as a CSV and put it in the data folder inside this project. Use examplesheet.xlsx as a guide. The import relies on columns H-V and column E for special notes.
 
-If you need to import more items from the spreadsheet after 2nd run, make sure all previously entered items get marked Y in column G of the spreadhseet. Then export the csv and replace the one in the data sheet.
+If you need to import more items from the spreadsheet after the second run, make sure all previously entered items are marked Y in column G of the spreadsheet. Then export the CSV and replace the one in the data folder.
 
-## Run 
+## Run
 
-Use the command below from project root, filling in the ENV variables with correct information to run the script.
+Use the command below from the project root. Make sure the environment variables in local.env are set correctly:
 
-```
+```sh
 npx playwright test tests/add-auction-items.spec.ts
 ```
 
 ### Debugging
 
-Use `--ui` or ` --slowmo=2000`. e.g.
+You can use --ui or --slowmo=2000. For example:
 
+```sh
+npx playwright test tests/add-auction-items.spec.ts --ui
 ```
-npx playwright test tests/add-auction-items.spec.ts. --ui
-```
-
