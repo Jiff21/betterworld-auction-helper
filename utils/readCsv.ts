@@ -24,7 +24,7 @@ export function readAuctionItems(): AuctionItem[] {
   const filePath = 'data/' + csvName;
   
   if (!fs.existsSync(filePath)) {
-    throw new Error(`File not found: ${filePath}`);
+    throw new Error(`File not found, you need to add a CSV to the data folder.\npath: ${filePath}`);
   }
 
   const csv = fs.readFileSync(filePath, 'utf8');

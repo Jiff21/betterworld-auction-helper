@@ -1,13 +1,20 @@
 import { test } from '@playwright/test';
-import 'dotenv/config';
+import dotenv from 'dotenv';
 
 import { readAuctionItems } from '../utils/readCsv';
 import { LoginPage } from '../pages/LoginPage';
 import { AuctionsPage } from '../pages/AuctionsPage';
 import { ItemFormPage } from '../pages/ItemFormPage';
 
-const auctionItemsUrl =
-  'https://dashboard.betterworld.org/auctions/56215/items';
+
+dotenv.config({ path: 'secrets/local.env' });
+
+const auctionItemsUrl = process.env.AUCTION_ITEMS_URL;
+
+if (!auctionItemsUrl) {
+  console.error('AUCTION_ITEMS_URL is not set. Please create a secrets/local.env file.');
+  process.exit(1);
+}
 
 test.describe('Auction item ingestion', () => {
   test('Add auction items from CSV', async ({ page }) => {

@@ -1,40 +1,37 @@
-# SETUP 
+# Better World Auction Item creation helper
 
-```
+## SETUP
+
+### Install dependencies
+
+Node install is a prequesite
+
+```bash
+cd <this folder>
 npm i
 ```
 
-Set ENV Varaiables for login to betterworld.
+Duplicate the file `example.env` file and name it `local.env`, fill out with your auction url, spreadsheet name, email and password. 
 
-```
-export BW_EMAIL=''
-export BW_PASSWORD=''
-```
+Before using the script you need to manually add 1 new item, then use the "New Section" button in Bettwe World to create all the categories from the spreadsheet, if you are not using default categories.
 
-## MV Data
+### Spreadsheet Data
 
-In google sheets go to the "2026 Accepted donations" filter out uploaded content and move it to the `data/` folder in this project.
+Export the Google Sheet as a csv and put it in the data folder inside this project. Use `examplesheet.xlsx` as a guide and the import is reliant on columns H-V and column E for special notes.
 
-# Run 
+## Run 
 
-Before using the script you may need to manually add 1 new item, then use the "New Section" button to create the categories from the spreadsheet. 
-
-Run slowly for debugging purposes
+Use the command below from project root, filling in the ENV variables with correct information to run the script.
 
 ```
 npx playwright test tests/add-auction-items.spec.ts
 ```
 
+### Debugging
+
+Use `--ui` or ` --slowmo=2000`. e.g.
 
 ```
-CSV_NAME='2026 Auction Donations Outreach Spreadsheet - 2026 Accepted donations.csv' npx playwright test tests/add-auction-items.spec.ts. --ui
+npx playwright test tests/add-auction-items.spec.ts. --ui
 ```
-
-CSV_NAME='2026 Auction Donations Outreach Spreadsheet - 2026 Accepted donations.csv' DEBUG=pw:api npx playwright test tests/add-auction-items.spec.ts --ui
-
-
-
-Make these dynamic 
-const auctionUrl= 'https://dashboard.betterworld.org/auctions/56215/items'
-const csvName = ''
 
