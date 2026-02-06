@@ -32,8 +32,17 @@ If you need to import more items from the spreadsheet after the second run, make
 
 Use the command below from the project root. Make sure the environment variables in local.env are set correctly:
 
+
+### Add Auction Items
+
 ```sh
 npx playwright test tests/add-auction-items.spec.ts
+```
+
+### Add Donation Campaign Items
+
+```sh
+npx playwright test tests/add-campaign-items.spec.ts
 ```
 
 ### Debugging
