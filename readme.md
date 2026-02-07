@@ -13,6 +13,7 @@ Node.js is a prerequisite.
 ```sh
 cd <this folder>
 npm i
+npx playwright install #if first playwright install
 ```
 ### Set account, spreadsheet name and auction details in an ENV file
 
@@ -44,6 +45,8 @@ npx playwright test tests/add-auction-items.spec.ts
 ```sh
 npx playwright test tests/add-flat-rate-items.spec.ts
 ```
+
+npx playwright test tests/add-bidding-items.spec.ts
 
 ### Debugging
 
