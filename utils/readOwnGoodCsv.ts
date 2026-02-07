@@ -1,7 +1,7 @@
 import fs from 'fs';
 import { parse } from 'csv-parse/sync';
 
-const campaignCSVName = process.env.CAMPAIGN_CSV_NAME || 'campaign-items.csv';
+const ownGoodCSVName = process.env.OWN_GOOD_CSV_NAME || 'campaign-items.csv';
 
 export interface CampaignItem {
   title: string;
@@ -13,7 +13,7 @@ export interface CampaignItem {
 }
 
 export function readCampaignItems(): CampaignItem[] {
-  const filePath = 'data/' + campaignCSVName;
+  const filePath = 'data/' + ownGoodCSVName;
   
   if (!fs.existsSync(filePath)) {
     throw new Error(`File not found, you need to add a CSV to the data folder.\npath: ${filePath}`);

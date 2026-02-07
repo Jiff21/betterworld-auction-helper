@@ -1,7 +1,7 @@
 import { test } from '@playwright/test';
 import dotenv from 'dotenv';
 
-import { readCampaignItems } from '../utils/readCampaignCsv';
+import { readFlatRate } from '../utils/readFlatRate';
 import { LoginPage } from '../pages/LoginPage';
 import { DonationCampaign } from '../pages/DonationCampaign';
 import { CampaignItemFormPage } from '../pages/campaignItemFormPage';
@@ -19,7 +19,7 @@ test.describe('Campaign item ingestion', () => {
   test('Add Campaign items from CSV', async ({ page }) => {
     test.setTimeout(10 * 60 * 1000);
 
-    const items = readCampaignItems();
+    const items = readFlatRate();
     console.log(`\n▶ Adding new ${items.length} items found`);
 
     const loginPage = new LoginPage(page);
@@ -54,7 +54,7 @@ test.describe('Campaign item ingestion', () => {
       await campaignItemFormPage.fillBasicInfo(item);
       await campaignItemFormPage.uploadImages(item.imageUrls);
       await campaignItemFormPage.filllOutNotes(item);
-
+      'item_edit_link'
     }
   });
 });

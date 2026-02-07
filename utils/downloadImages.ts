@@ -23,7 +23,7 @@ export async function downloadImage(url: string, filename: string): Promise<stri
 
   if (!response.ok) {
     console.log(`Failed to download ${url}: ${response.status} ${response.statusText}`);
-    // throw new Error(`Failed to download ${url}: ${response.status} ${response.statusText}`);
+    throw new Error(`Failed to download ${url}: ${response.status} ${response.statusText}`);
   }
 
   // 3. Stream the response body to a file

@@ -42,7 +42,7 @@ npx playwright test tests/add-auction-items.spec.ts
 ### Add Donation Campaign Items
 
 ```sh
-npx playwright test tests/add-campaign-items.spec.ts
+npx playwright test tests/add-flat-rate-items.spec.ts
 ```
 
 ### Debugging
