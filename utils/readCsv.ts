@@ -1,7 +1,7 @@
 import fs from 'fs';
 import { parse } from 'csv-parse/sync';
 
-const csvName = process.env.CSV_NAME || 'auction-items.csv';
+const csvName = process.env.AUCTION_CSV_NAME || 'auction-items.csv';
 
 export interface AuctionItem {
   title: string;

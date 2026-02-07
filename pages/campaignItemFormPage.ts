@@ -1,7 +1,5 @@
 import { Page } from '@playwright/test';
-import path from 'path';
-import { parseImageUrls } from '../utils/parseImageUrls';
-import { downloadImage } from '../utils/downloadImages';
+import { uploadItemImages } from '../utils/uploadItemImages';
 
 export class CampaignItemFormPage {
   constructor(private readonly page: Page) {}
@@ -65,48 +63,16 @@ export class CampaignItemFormPage {
     await this.quantityInput.fill(`${item.quantity}`);
     await this.nextButton.click();
 
+    await this.page.locator('#go-to-edit-page').click();
+
     // create item
     await Promise.all([
       this.createItemButton.click(),
     ]);
   }
 
-  // upload item images
   async uploadImages(imageUrls?: string) {
-    const urls = parseImageUrls(imageUrls);
-    if (!urls.length) return;
-
-    await this.page.locator('#go-to-edit-page').click();
-    
-    for (let i = 0; i < urls.length; i++) {
-      const url = urls[i];
-      const ext = path.extname(url).split('?')[0] || '.png';
-      const filename = `item-${Date.now()}-${i}${ext}`;
-      const localPath = await downloadImage(url, filename);
-
-      const imageModal = this.page.locator('#new_image');
-
-      await this.page.locator('#add_image').click();
-
-      const chooser = await Promise.all([
-        this.page.waitForEvent('filechooser'),
-        this.page.getByRole('link', { name: 'Browse' }).click(),
-      ]).then(([fc]) => fc);
-
-      await chooser.setFiles(localPath);
-
-      await Promise.all([
-        imageModal.waitFor({ state: 'hidden' }),
-        this.page
-          .locator('#new_image_form')
-          .getByRole('button', { name: 'Save' })
-          .click(),
-      ]);
-    }
-
-    await Promise.all([
-      this.page.getByRole('button', { name: 'Save', exact: true }).click(),
-    ]);
+    await uploadItemImages(this.page, imageUrls);
   }
 
   // Fill out internal notes
