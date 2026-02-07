@@ -18,6 +18,7 @@ export interface AuctionItem {
   fulfillmentEmail: string;
   imageUrls?: string;
   notes: string;
+  quantity?: number;
 }
 
 export function readAuctionItems(): AuctionItem[] {

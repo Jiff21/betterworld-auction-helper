@@ -43,7 +43,7 @@ export function readBiddingItems(): AuctionItem[] {
       const time = row['Proposed time for event'] || '';
       const location = row['Location of event'] || '';
       const whoCanAttend = row['Who can attend?'] || '';
-      const quantity = row['How many spots are available for your event?'] || '';
+      const quantity = Number(row['How many spots are available for your event?']);
       const valuePerSpot = row['$ value for each spot'] || '0';
       const notes = row["Anything else you'd like to tell us about your party?"] || '';
       const imageUrls = row['(Optional) Provide image(s) as links, if applicable'] || '';
@@ -58,7 +58,6 @@ Hosted by: ${hostName}
 Date: ${date} @ ${time}
 Location: ${location}
 For: ${whoCanAttend}
-Spots available: ${quantity}
       `.trim();
 
       // Use value per spot as both estimated value and starting bid
@@ -73,7 +72,8 @@ Spots available: ${quantity}
         descriptor: '', // this was added to the title, we don't need it here
         category: 'Count-Me-In Auctions',
         estimatedValue: numericValue,
-        startingBid: Math.round(numericValue * 0.33), // 33% of the value
+        // startingBid: Math.round(numericValue * 0.33), // 33% of the value
+        startingBid: Math.round(numericValue), // set to the value per item just in case people want lower
         shortDescription: shortDescription,
         longDescription: longDescription,
         donorName: hostName,
@@ -82,6 +82,7 @@ Spots available: ${quantity}
         fulfillmentEmail: email,
         imageUrls: imageUrls,
         notes: notes,
+        quantity,
       };
     });
 }

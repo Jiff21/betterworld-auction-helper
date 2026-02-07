@@ -39,8 +39,8 @@ export function readOwnGoodBiddingItems(): AuctionItem[] {
       const title = row['What are you donating?'];
       const description = row['Description of item (Please also mention any potential food allergies if edible)'] || '';
       const donorName = row['Name of Donor (Last, First)'] || '';
-      const quantity = Number(row['How many items are available for sale/auction?'])s;
-      const valuePerItem = Number(row['$ value for each item'] || '10');
+      const quantity = Number(row['How many items are available for sale/auction?']) || 1;
+      const valuePerItemRaw = row['$ value for each item'] || '10';
       const fulfillmentInfo = row['How should winners of your item(s) receive their goods?'] || '';
       const additionalNotes = row["Anything else you'd like to share?"] || '';
       const imageUrls = row['(Optional) Send image link(s), if applicable'] || '';
@@ -49,8 +49,8 @@ export function readOwnGoodBiddingItems(): AuctionItem[] {
       // Build long description
       const longDescription = description;
 
-      // Use value per item as estimated value
-      const numericValue = Number(valuePerItem.replace(/[^0-9.]/g, '')) || 0;
+      // Use value per item as estimated value (strip non-numeric for currency etc.)
+      const numericValue = Number(String(valuePerItemRaw).replace(/[^0-9.]/g, '')) || 0;
 
       // Create short description from title
       const shortDescription = title;
@@ -64,7 +64,8 @@ export function readOwnGoodBiddingItems(): AuctionItem[] {
         descriptor: '', // No descriptor needed
         category: 'Count-Me-In Auctions',
         estimatedValue: numericValue,
-        startingBid: Math.round(numericValue * 0.33), // 33% of the value
+        // startingBid: Math.round(numericValue * 0.33), // 33% of the value
+        startingBid: Math.round(numericValue), // set to the value per item just in case people want lower
         shortDescription: shortDescription,
         longDescription: longDescription,
         donorName: donorName,
@@ -73,6 +74,7 @@ export function readOwnGoodBiddingItems(): AuctionItem[] {
         fulfillmentEmail: email,
         imageUrls: imageUrls,
         notes: notes,
+        quantity,
       };
     });
 }

@@ -40,22 +40,28 @@ test.describe('Bidding item ingestion', () => {
 
     for (const item of items) {
       index++;
+      const quantity = item.quantity ?? 1;
       console.log(
-        `\n▶ Adding item ${index} / ${items.length}: ${item.title}`
+        `\n▶ Adding item ${index} / ${items.length}: ${item.title} (×${quantity})`
       );
 
-      // Always navigate fresh for each item
-      await auctionsPage.goToItems(auctionItemsUrl);
+      for (let copy = 0; copy < quantity; copy++) {
+        if (quantity > 1) {
+          console.log(`  ▶ Copy ${copy + 1} / ${quantity}`);
+        }
 
-      // Start item creation
-      await auctionsPage.startNewItem();
+        // Always navigate fresh for each item
+        await auctionsPage.goToItems(auctionItemsUrl);
 
-      // ── ITEM WORKFLOW ────────────────────
-      await itemForm.fillBasicInfo(item);
-      await itemForm.uploadImages(item.imageUrls);
-      await itemForm.fillDonor(item);
-      await itemForm.fillNotes(item.notes);
+        // Start item creation
+        await auctionsPage.startNewItem();
 
+        // ── ITEM WORKFLOW ────────────────────
+        await itemForm.fillBasicInfo(item);
+        await itemForm.uploadImages(item.imageUrls);
+        await itemForm.fillDonor(item);
+        await itemForm.fillNotes(item.notes);
+      }
     }
   });
 });
