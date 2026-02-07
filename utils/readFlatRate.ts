@@ -29,16 +29,19 @@ export function readFlatRate(): CampaignItem[] {
 
   return records
     .filter((row: any) => {
-      // 1. Use the correct column name for the title
+      // 1. Check Flat rate type 
+      const offeringType = row['How would you like your items offered?'] || '';
+      const hasSignUp = offeringType.toLowerCase().includes('sign-up');
+
+      // 2. Check not empty row
       const titleValue = row['Name of your event/party'];
       const hasTitle = titleValue && titleValue.trim() !== "";
       
-      // 2. Check exclusion status
+      // 3. Check if already added
       const status = row['BetterWorld Status'] ? row['BetterWorld Status'].trim() : "";
-      const method = row['How would you like your spots offered?'].toLowerCase();
-      const isExcluded = status === "U" || status === "Y" || method.includes('bidding');
+      const isExcluded = status === "U" || status === "Y";
       
-      return hasTitle && !isExcluded;
+      return hasSignUp && hasTitle && !isExcluded;
     })
     .map((row: any) => ({
       // Access the actual row data using row['Column Name']

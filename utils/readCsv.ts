@@ -40,10 +40,9 @@ export function readAuctionItems(): AuctionItem[] {
     .filter((row: any) => {
       // 1. Filter out empty rows
       const hasTitle = row['Title'] && row['Title'].trim() !== "";
-      // 1. Filter out already uploaded Items
-      const columnGValue = row['BetterWorld Status'] ? row['BetterWorld Status'].trim() : "";
-      const isExcluded = columnGValue === "U" || columnGValue === "Y";
-      
+      // 2. Filter out already uploaded Items
+      const status = row['BetterWorld Status'] ? row['BetterWorld Status'].trim() : "";
+      const isExcluded = status === "U" || status === "Y";
       // Only keep the row if both Title and not already added to Better World
       return hasTitle && !isExcluded;
     })

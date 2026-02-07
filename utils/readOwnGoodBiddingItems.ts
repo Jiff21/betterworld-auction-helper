@@ -30,8 +30,7 @@ export function readOwnGoodBiddingItems(): AuctionItem[] {
       
       // 3. Filter out already uploaded Items
       const status = row['BetterWorld Status'] ? row['BetterWorld Status'].trim() : "";
-      const method = row['How would you like your items offered?'] ? row['How would you like your items offered?'].toLowerCase() : "";
-      const isExcluded = status === "U" || status === "Y" || method.includes('sign-up');
+      const isExcluded = status === "U" || status === "Y";
       
       return hasBidding && hasTitle && !isExcluded;
     })
@@ -40,7 +39,7 @@ export function readOwnGoodBiddingItems(): AuctionItem[] {
       const title = row['What are you donating?'];
       const description = row['Description of item (Please also mention any potential food allergies if edible)'] || '';
       const donorName = row['Name of Donor (Last, First)'] || '';
-      const quantity = Number(row['How many items are available for sale/auction?']) || 1;
+      const quantity = Number(row['How many items are available for sale/auction?'])s;
       const valuePerItem = Number(row['$ value for each item'] || '10');
       const fulfillmentInfo = row['How should winners of your item(s) receive their goods?'] || '';
       const additionalNotes = row["Anything else you'd like to share?"] || '';
