@@ -35,7 +35,8 @@ export function readFlatRate(): CampaignItem[] {
       
       // 2. Check exclusion status
       const status = row['BetterWorld Status'] ? row['BetterWorld Status'].trim() : "";
-      const isExcluded = status === "U" || status === "Y";
+      const method = row['How would you like your spots offered?'].toLowerCase();
+      const isExcluded = status === "U" || status === "Y" || method.includes('bidding');
       
       return hasTitle && !isExcluded;
     })

@@ -30,7 +30,8 @@ export function readBiddingItems(): AuctionItem[] {
       
       // 3. Filter out already uploaded Items
       const status = row['BetterWorld Status'] ? row['BetterWorld Status'].trim() : "";
-      const isExcluded = status === "U" || status === "Y";
+      const method = row['How would you like your spots offered?'].toLowerCase();
+      const isExcluded = status === "U" || status === "Y" || method.includes('sign-up');
       
       return hasBidding && hasTitle && !isExcluded;
     })

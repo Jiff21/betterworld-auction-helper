@@ -38,7 +38,8 @@ export function readOwnGoodFlatRate(): CampaignItem[] {
       
       // 3. Filter out already uploaded Items
       const status = row['BetterWorld Status'] ? row['BetterWorld Status'].trim() : "";
-      const isExcluded = status === "U" || status === "Y";
+      const method = row['How would you like your items offered?'] ? row['How would you like your items offered?'].toLowerCase() : "";
+      const isExcluded = columnSValue === "U" || columnSValue === "Y" || method.includes('bidding');
       
       return hasSignUp && hasTitle && !isExcluded;
     })
